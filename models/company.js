@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+
 const { Schema } = mongoose;
 
-const userSchema = new Schema(
+const companySchema = new Schema(
   {
     name: String,
     razaosocial: String,
@@ -10,13 +11,13 @@ const userSchema = new Schema(
     phone: String,
     speciality: [ {type: String} ],
     location: { type: {type: String}, coordinates: [Number] },
-    user: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-const User = mongoose.model("User", userSchema);
+const Company = mongoose.model('Company', companySchema);
 
-module.exports = User;
+module.exports = Company;

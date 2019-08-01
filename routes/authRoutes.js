@@ -7,8 +7,7 @@ const User = require('../models/user');
 // sign up route
 
 authRoutes.post('/signup', (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
+  const { username, password } = req.body;
 
   if (!username || !password) {
     res.status(400).json({ message: 'Provide username and password' });
@@ -36,8 +35,8 @@ authRoutes.post('/signup', (req, res, next) => {
     const hashPass = bcrypt.hashSync(password, salt);
 
     const newUser = new User({
-      username: username,
-      password: hashPass
+      username,
+      hashPass,
     });
 
     newUser.save((err) => {
@@ -65,7 +64,7 @@ authRoutes.post('/signup', (req, res, next) => {
 
 // Login route
 
-authRoutes.post('/login', (req, res, next) => {
+authRoutes.post('api/login', (req, res, next) => {
   passport.authenticate('local', (err, theUser, failureDetails) => {
     if (err) {
       res.status(500).json({ message: 'Something went wrong authenticating user' });
@@ -94,7 +93,7 @@ authRoutes.post('/login', (req, res, next) => {
 
 // Logout route
 
-authRoutes.post('/logout', (req, res, next) => {
+authRoutes.post('api/logout', (req, res, next) => {
   // req.logout() is defined by passport
   req.logout();
   res.status(200).json({ message: 'Log out success!' });
