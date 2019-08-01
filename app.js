@@ -22,7 +22,6 @@ const passport = require('passport');
 
 require('./configs/passport');
 
-
 // IF YOU STILL DIDN'T, GO TO 'configs/passport.js' AND UN-COMMENT OUT THE WHOLE FILE
 
 mongoose
@@ -75,6 +74,7 @@ app.use(cors({
   credentials: true,
   origin: ['http://localhost:3000'] // <== this will be the URL of our React app (it will be running on port 3000)
 }));
+
 
 // ROUTES MIDDLEWARE STARTS HERE:
 app.use('/api', require('./routes/index'));
