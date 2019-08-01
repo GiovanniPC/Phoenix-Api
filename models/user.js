@@ -10,6 +10,7 @@ const userSchema = new Schema(
     status: { type: String, enum: ["Active", "Pending"], default: "Pending" },
     address: String,
     cpf: String,
+    token: String,
     product: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
     company: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   },

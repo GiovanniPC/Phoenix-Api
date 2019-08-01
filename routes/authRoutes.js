@@ -3,15 +3,23 @@ const authRoutes = express.Router();
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+// const nodemailer = require('nodemailer');
+const transporter = require('../configs/nodemailer');
 
 // sign up route
 
+
 authRoutes.post('/signup', (req, res, next) => {
+  console.log('>>>>>>>>>>>>>>>>', req.body);
   const username = req.body.username;
   const password = req.body.password;
+  const name = req.body.name;
+  const cpf = req.body.cpf;
 
-  if (!username || !password) {
-    res.status(400).json({ message: 'Provide username and password' });
+
+
+  if (!username || !password || !name || !cpf) {
+    res.status(400).json({ message: 'Provide username, password, name and cpf.' });
     return;
   }
 
@@ -34,20 +42,29 @@ authRoutes.post('/signup', (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(10);
     const hashPass = bcrypt.hashSync(password, salt);
+    const confirmationCode = bcrypt.hashSync(username, salt);
 
     const newUser = new User({
-      username: username,
-      password: hashPass
+      username,
+      password: hashPass,
+      name,
+      cpf,
+      token: confirmationCode
     });
 
-    newUser.save((err) => {
-      if (err) {
-        res.status(400).json({ message: 'Saving user to database went wrong.' });
-        return;
-      }
 
-      // Automatically log in user after sign up
-      // .login() here is actually predefined passport method
+    newUser.save()
+    .then(() => {
+      transporter.sendMail({
+        from:  '"Phoenix Forge" <phoenixforge@email.com>',
+        to: username,
+        subject: 'Welcome to Phoenix Forge! Please confirm your account.',
+        text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
+        html: `
+        <h3>Hi, there!</h3>
+        <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
+      });
+
       req.login(newUser, (err) => {
 
         if (err) {
@@ -55,11 +72,13 @@ authRoutes.post('/signup', (req, res, next) => {
           return;
         }
 
-        // Send the user's information to the frontend
-        // We can use also: res.status(200).json(req.user);
         res.status(200).json(newUser);
       });
-    });
+
+    }).catch(error => {
+      console.log(error);
+      res.status(400).json({ message: 'Saving user to database went wrong.' });
+    })
   });
 });
 

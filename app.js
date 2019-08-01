@@ -22,11 +22,6 @@ const passport = require('passport');
 
 require('./configs/passport');
 
-// ROUTES MIDDLEWARE STARTS HERE:
-
-app.use('/', require('./routes/authRoutes'));
-app.use('/', require('./routes/index'));
-
 // IF YOU STILL DIDN'T, GO TO 'configs/passport.js' AND UN-COMMENT OUT THE WHOLE FILE
 
 mongoose
@@ -80,6 +75,7 @@ app.use(cors({
   origin: ['http://localhost:3000'] // <== this will be the URL of our React app (it will be running on port 3000)
 }));
 
-
+app.use('/api', require('./routes/authRoutes'));
+app.use('/api', require('./routes/index'));
 
 module.exports = app;
