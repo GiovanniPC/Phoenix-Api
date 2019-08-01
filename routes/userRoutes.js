@@ -25,7 +25,7 @@ userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
 
   User.update(
     { _id: profileID },
-    { $set: { name, hashPass, address, city, cep } }
+    { $set: { name, password: hashPass, address, city, cep } }
   )
   .then(profile => {
     res.status(200).json(profile);
