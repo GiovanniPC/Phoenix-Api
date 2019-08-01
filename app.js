@@ -80,6 +80,7 @@ app.use(cors({
 app.use('/api', require('./routes/index'));
 app.use('/api', require('./routes/authRoutes'));
 app.use('/api', require('./routes/company'));
+app.use('/api', require('./routes/userRoutes'));
 
 
 module.exports = app;

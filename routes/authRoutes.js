@@ -3,14 +3,11 @@ const authRoutes = express.Router();
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-// const nodemailer = require('nodemailer');
 const transporter = require('../configs/nodemailer');
 
 // sign up route
-
-
 authRoutes.post('/signup', (req, res, next) => {
-  console.log('>>>>>>>>>>>>>>>>', req.body);
+
   const username = req.body.username;
   const password = req.body.password;
   const name = req.body.name;
@@ -55,7 +52,7 @@ authRoutes.post('/signup', (req, res, next) => {
     newUser.save()
     .then(() => {
       transporter.sendMail({
-        from:  '"Phoenix Forge" <phoenixforge@email.com>',
+        from:  '"Phoenix Forge" <phoenixforge@hotmail.com>',
         to: username,
         subject: 'Welcome to Phoenix Forge! Please confirm your account.',
         text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
@@ -83,7 +80,7 @@ authRoutes.post('/signup', (req, res, next) => {
 
 // Login route
 
-authRoutes.post('api/login', (req, res, next) => {
+authRoutes.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, theUser, failureDetails) => {
     if (err) {
       res.status(500).json({ message: 'Something went wrong authenticating user' });
@@ -112,7 +109,7 @@ authRoutes.post('api/login', (req, res, next) => {
 
 // Logout route
 
-authRoutes.post('api/logout', (req, res, next) => {
+authRoutes.post('/logout', (req, res, next) => {
   // req.logout() is defined by passport
   req.logout();
   res.status(200).json({ message: 'Log out success!' });
