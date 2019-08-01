@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+
 const { Schema } = mongoose;
 
 const companySchema = new Schema(
@@ -11,12 +12,15 @@ const companySchema = new Schema(
     speciality: [ {type: String} ],
     location: { type: {type: String}, coordinates: [Number] },
     user: { type: Schema.Types.ObjectId, ref: 'User' }
+
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
+
 const Company = mongoose.model("Company", companySchema);
+
 
 module.exports = Company;

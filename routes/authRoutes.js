@@ -17,7 +17,6 @@ authRoutes.post('/signup', (req, res, next) => {
   const cpf = req.body.cpf;
 
 
-
   if (!username || !password || !name || !cpf) {
     res.status(400).json({ message: 'Provide username, password, name and cpf.' });
     return;
@@ -84,7 +83,7 @@ authRoutes.post('/signup', (req, res, next) => {
 
 // Login route
 
-authRoutes.post('/login', (req, res, next) => {
+authRoutes.post('api/login', (req, res, next) => {
   passport.authenticate('local', (err, theUser, failureDetails) => {
     if (err) {
       res.status(500).json({ message: 'Something went wrong authenticating user' });
@@ -113,7 +112,7 @@ authRoutes.post('/login', (req, res, next) => {
 
 // Logout route
 
-authRoutes.post('/logout', (req, res, next) => {
+authRoutes.post('api/logout', (req, res, next) => {
   // req.logout() is defined by passport
   req.logout();
   res.status(200).json({ message: 'Log out success!' });

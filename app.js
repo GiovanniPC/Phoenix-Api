@@ -25,13 +25,13 @@ require('./configs/passport');
 // IF YOU STILL DIDN'T, GO TO 'configs/passport.js' AND UN-COMMENT OUT THE WHOLE FILE
 
 mongoose
-  .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
-  .then(x => {
-    console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
-  })
-  .catch(err => {
-    console.error('Error connecting to mongo', err)
-  });
+.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+.then(x => {
+  console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
+})
+.catch(err => {
+  console.error('Error connecting to mongo', err)
+});
 
 const app_name = require('./package.json').name;
 const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
@@ -75,7 +75,11 @@ app.use(cors({
   origin: ['http://localhost:3000'] // <== this will be the URL of our React app (it will be running on port 3000)
 }));
 
-app.use('/api', require('./routes/authRoutes'));
+
+// ROUTES MIDDLEWARE STARTS HERE:
 app.use('/api', require('./routes/index'));
+app.use('/api', require('./routes/authRoutes'));
+app.use('/api', require('./routes/company'));
+
 
 module.exports = app;
