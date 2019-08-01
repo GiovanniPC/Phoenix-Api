@@ -13,7 +13,7 @@ const userSchema = new Schema(
     cpf: String,
     token: String,
     product: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
-    company: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+    company: [{ type: Schema.Types.ObjectId, ref: 'Company' }],
   },
   {
     timestamps: true,

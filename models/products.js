@@ -5,7 +5,7 @@ const productSchema = new Schema(
   {
     name: String,
     status: { type: String, enum:['Request', 'FirstReponse', 'ToRepair', 'OrderRepair', 'WantRepair', 'InRepair', 'SendCompany', 'ToStore'], default: 'Request'},
-    statusProdcuct: { type: String, enum:['Broken', 'Semi-used']},
+    statusProduct: { type: String, enum:['Broken', 'Semi-used']},
     categories: { type: String, enum:["Laptop", "Tablet", "Mobile", "Consoles", "TV's", "Audio"]},
     path: { type: String, enum:['Repair', 'Sell']},
     brand: String,

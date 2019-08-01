@@ -61,7 +61,7 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.use(session({
   secret: 'the cake is a lie',
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
 }));
 
 // USE passport.initialize() and passport.session() HERE:
@@ -72,7 +72,7 @@ app.use(passport.session());
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:3000'] // <== this will be the URL of our React app (it will be running on port 3000)
+  origin: ['http://localhost:3000'], // <== this will be the URL of our React app (it will be running on port 3000)
 }));
 
 
