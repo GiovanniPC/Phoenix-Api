@@ -2,6 +2,8 @@ const express = require('express');
 const userRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
+
 // const transporter = require('../configs/nodemailer');
 
 // Profile
@@ -18,10 +20,12 @@ userRoutes.get("/profile/:userID", (req, res) => {
 userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
   const { profileID } = req.params;
   const { password, name, address, city, cep } = req.body;
-  
+  const salt = bcrypt.genSaltSync(10);
+  const hashPass = bcrypt.hashSync(password, salt);
+
   User.update(
     { _id: profileID },
-    { $set: { name, password, address, city, cep } }
+    { $set: { name, hashPass, address, city, cep } }
   )
   .then(profile => {
     res.status(200).json(profile);
