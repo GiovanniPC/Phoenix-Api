@@ -40,6 +40,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
 
   switch (status) {
     case 'FirstResponse':
+
+      if (!starterPrice || !companyDescription) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -55,6 +61,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'ToRepair':
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -68,6 +75,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'OrderRepair':
+
+      if (!repairPrice || !repairDescription || !model || !specs) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -85,6 +98,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'WantRepair':
+
+      if (!repairPrice || !repairDescription) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -127,6 +146,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'toStore':
+
+      if (!totalPrice || !finalDescription || !comission || !sellingPrice) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,

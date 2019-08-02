@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const companySchema = new Schema(
   {
     name: String,
+    approved: { type: Boolean, default: false },
     razaosocial: String,
     cnpj: String,
     address: String,
