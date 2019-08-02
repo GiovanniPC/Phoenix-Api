@@ -10,7 +10,7 @@ const transporter = require('../configs/nodemailer');
 authRoutes.post('/signup', (req, res, next) => {
   const { username, password, name, cpf } = req.body;
 
-  if (!username || !password || !name || !cpf) {
+  if (!username || !password) {
     res.status(400).json({ message: 'Provide username, password, name and cpf.' });
     return;
   }
