@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const Product = require('../models/products');
 const User = require('../models/user');
 const Company = require('../models/company');
+const transporter = require('../configs/nodemailer');
 
 // Profile
 userRoutes.get('/profile/:userID', (req, res) => {
@@ -47,7 +48,7 @@ userRoutes.post('/new-product', (req, res) => {
     starterPrice,
     clientDescription,
     imageUrl,
-    idCompany,
+    idCompany, // this should be passed by params?
   } = req.body;
   const { id } = req.user;
 
@@ -88,7 +89,28 @@ userRoutes.post('/new-product', (req, res) => {
       break;
 
     case 'Repair':
-      // what to do here?
+      Company.findById(idCompany)
+      .then()
+      .catch()
+        transporter.sendMail({
+          from: '"Phoenix Forge" <phoenixforge@hotmail.com>',
+          to: username,
+          subject: 'Welcome to Phoenix Forge! Please confirm your account.',
+          text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
+          html: `
+        <h3>Hi, there!</h3>
+        <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
+        });
+
+        transporter.sendMail({
+          from: '"Phoenix Forge" <phoenixforge@hotmail.com>',
+          to: username,
+          subject: 'Welcome to Phoenix Forge! Please confirm your account.',
+          text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
+          html: `
+        <h3>Hi, there!</h3>
+        <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
+        });
       break;
     default:
       break;
