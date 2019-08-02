@@ -82,6 +82,7 @@ app.use('/api', require('./routes/authRoutes'));
 app.use('/api', require('./routes/company'));
 app.use('/api', require('./routes/userRoutes'));
 app.use('/api', require('./routes/productRoutes'));
+app.use('/api', require('./routes/cloudinaryUpload'));
 
 
 module.exports = app;

@@ -83,7 +83,7 @@ routes.put('/edit-company/:id', (req, res, next) => {
       speciality,
       phone,
       cnpj,
-    } 
+    }
   })
     .then(() => {
       res.status(200).json({ message: `Company with ${req.params.id} is updated successfully.` });
@@ -115,5 +115,14 @@ routes.get('/get-products', (req, res, next) => {
     .catch(err => console.log(err))
 });
 
+// get all companies
+
+routes.get('/all-companies', (req, res, next) => {
+  Company.find()
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+});
 
 module.exports = routes;
