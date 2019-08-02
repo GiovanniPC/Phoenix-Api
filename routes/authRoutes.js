@@ -7,11 +7,7 @@ const transporter = require('../configs/nodemailer');
 
 // sign up route
 authRoutes.post('/signup', (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  const name = req.body.name;
-  const cpf = req.body.cpf;
-
+  const { username, password, name, cpf } = req.body;
 
   if (!username || !password || !name || !cpf) {
     res.status(400).json({ message: 'Provide username, password, name and cpf.' });
@@ -49,13 +45,13 @@ authRoutes.post('/signup', (req, res, next) => {
 
 
     newUser.save()
-    .then(() => {
-      transporter.sendMail({
-        from:  '"Phoenix Forge" <phoenixforge@hotmail.com>',
-        to: username,
-        subject: 'Welcome to Phoenix Forge! Please confirm your account.',
-        text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
-        html: `
+      .then(() => {
+        transporter.sendMail({
+          from: '"Phoenix Forge" <phoenixforge@hotmail.com>',
+          to: username,
+          subject: 'Welcome to Phoenix Forge! Please confirm your account.',
+          text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
+          html: `
         <h3>Hi, there!</h3>
         <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
         });
@@ -87,8 +83,6 @@ authRoutes.post('/login', (req, res, next) => {
     }
 
     if (!theUser) {
-      // "failureDetails" contains the error messages
-      // from our logic in "LocalStrategy" { message: '...' }.
       res.status(401).json(failureDetails);
       return;
     }
@@ -100,18 +94,19 @@ authRoutes.post('/login', (req, res, next) => {
         return;
       }
 
-      // We are now logged in (that's why we can also send req.user)
       res.status(200).json(theUser);
     });
   })(req, res, next);
 });
 
-// Logout route
+// Logout route will kill the session
 
-authRoutes.post('/logout', (req, res, next) => {
+authRoutes.get('/logout', (req, res, next) => {
   req.logout();
   res.status(200).json({ message: 'Log out success!' });
 });
+
+// verify if the user is loggedin in the server
 
 authRoutes.get('/loggedin', (req, res, next) => {
   if (req.isAuthenticated()) {

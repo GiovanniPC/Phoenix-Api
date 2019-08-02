@@ -54,7 +54,6 @@ userRoutes.post('/new-product', (req, res) => {
     path,
     brand,
     model,
-    specs,
     starterPrice,
     clientDescription,
     imageUrl,
