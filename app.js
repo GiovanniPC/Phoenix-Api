@@ -13,25 +13,19 @@ const cors = require('cors');
 
 const app = express();
 
-// WHEN INTRODUCING USERS DO THIS:
-// INSTALL THESE DEPENDENCIES: passport-local, passport, bcryptjs, express-session
-// AND UN-COMMENT OUT FOLLOWING LINES:
-
 const session = require('express-session');
 const passport = require('passport');
 
 require('./configs/passport');
 
-// IF YOU STILL DIDN'T, GO TO 'configs/passport.js' AND UN-COMMENT OUT THE WHOLE FILE
-
 mongoose
-.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
-.then(x => {
-  console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
-})
-.catch(err => {
-  console.error('Error connecting to mongo', err)
-});
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+  .then((x) => {
+    console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
+  })
+  .catch((err) => {
+    console.error('Error connecting to mongo', err)
+  });
 
 const app_name = require('./package.json').name;
 const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
@@ -72,12 +66,12 @@ app.use(passport.session());
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:3000'], // <== this will be the URL of our React app (it will be running on port 3000)
+  origin: ['http://localhost:3000'], // React app port
 }));
 
 
 // ROUTES MIDDLEWARE STARTS HERE:
-app.use('/api', require('./routes/index'));
+app.use('/api', require('./routes/adminRoutes'));
 app.use('/api', require('./routes/authRoutes'));
 app.use('/api', require('./routes/company'));
 app.use('/api', require('./routes/userRoutes'));

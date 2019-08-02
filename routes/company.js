@@ -104,7 +104,7 @@ routes.get('/get-company', (req, res, next) => {
     .catch(err => console.log(err))
 })
 
-// get products related to a specific company
+// get the user companie and the products related to it, use it for the repair store side 
 
 routes.get('/get-products', (req, res, next) => {
   Company.findOne({ user: req.user.id })
@@ -113,16 +113,6 @@ routes.get('/get-products', (req, res, next) => {
       res.status(200).json(answer);
     })
     .catch(err => console.log(err))
-});
-
-// get all companies
-
-routes.get('/all-companies', (req, res, next) => {
-  Company.find()
-    .then((answer) => {
-      res.status(200).json(answer);
-    })
-    .catch(err => res.status(500).json(err));
 });
 
 module.exports = routes;
