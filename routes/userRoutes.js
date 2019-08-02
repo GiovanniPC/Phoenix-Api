@@ -2,20 +2,18 @@ const express = require('express');
 const userRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
+const Company = require('../models/company');
 const bcrypt = require('bcrypt');
-
-// const transporter = require('../configs/nodemailer');
 
 // Profile
 userRoutes.get("/profile/:userID", (req, res) => {
   const userId = req.params.userID;
-  User.findById(userId)
+  User.findById(userId).populate('product')
     .then((profile) => {
       res.status(200).json(profile);
     })
     .catch(err => console.log(err));
-}
-);
+});
 
 userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
   const { profileID } = req.params;
@@ -23,7 +21,7 @@ userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
   const salt = bcrypt.genSaltSync(10);
   const hashPass = bcrypt.hashSync(password, salt);
 
-  User.update(
+  User.updateOne(
     { _id: profileID },
     { $set: { name, password: hashPass, address, city, cep } }
   )
@@ -33,14 +31,13 @@ userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
     .catch((error) => {
       console.log(error);
     });
-
 });
 
 // route for the user start his sell
 userRoutes.post('/new-product', (req, res) => {
 
-  const { name, statusProduct, categories, path, brand, model, specs, starterPrice, clientDescription, imageUrl } = req.body;
-
+  const { name, statusProduct, categories, path, brand, model, starterPrice, clientDescription, imageUrl, idCompany } = req.body;
+  const { id } = req.user;
 
   if (!name || !statusProduct || !categories || !path || !brand || !starterPrice || !clientDescription) {
     res.status(400).json({ message: 'Something is missing in the form.' });
@@ -62,7 +59,15 @@ userRoutes.post('/new-product', (req, res) => {
 
   newProduct.save()
     .then((product) => {
-      res.status(200).json(product);
+      User.updateOne({_id: id}, {$push: {product: product.id}})
+      .then(user =>{
+        Company.updateOne({_id: idCompany}, {$push: {products: product.id}})
+        .then(user =>{
+          res.status(200).json(product);
+        })
+        .catch(err => res.status(500).json({ message: err }));
+      })
+      .catch(err => res.status(500).json({ message: err }));
     })
     .catch(err => res.status(500).json({ message: err }));
 });
@@ -95,6 +100,15 @@ userRoutes.get('/product/:id', (req, res) => {
       res.status(200).json(product);
     })
     .catch(err => res.status(500).json({ message: "Nothing" }));
+});
+
+userRoutes.get('/client-products/:id', (req,res) => {
+  const { id } = req.params;
+  User.findById(id).populate('product')
+  .then(products => {
+    res.status(200).json(products);
+  })
+  .catch(err => res.status(500).json({ message: "Nothing" }));
 });
 
 module.exports = userRoutes;
