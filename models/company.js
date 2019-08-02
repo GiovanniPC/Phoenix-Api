@@ -12,7 +12,7 @@ const companySchema = new Schema(
     speciality: [{ type: String, enum: ['Laptop', 'Tablet', 'Mobile', 'Consoles', "TV's", 'Audio'] }],
     location: { type: { type: String }, coordinates: [Number] },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    products: { type: Schema.Types.ObjectId, ref: 'Products' },
+    products: [{ type: Schema.Types.ObjectId, ref: 'Products' }],
   },
   {
     timestamps: true,
