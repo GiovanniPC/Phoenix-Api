@@ -10,6 +10,7 @@ const companySchema = new Schema(
     cnpj: String,
     address: String,
     phone: String,
+    email: String,
     speciality: [{ type: String, enum: ['Laptop', 'Tablet', 'Mobile', 'Consoles', "TV's", 'Audio'] }],
     location: { type: { type: String }, coordinates: [Number] },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
