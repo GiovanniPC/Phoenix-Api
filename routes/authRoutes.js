@@ -10,14 +10,14 @@ const transporter = require('../configs/nodemailer');
 
 
 authRoutes.post('/signup', (req, res, next) => {
-  console.log('>>>>>>>>>>>>>>>>', req.body);
+  
   const username = req.body.username;
   const password = req.body.password;
   const name = req.body.name;
   const cpf = req.body.cpf;
 
 
-  if (!username || !password || !name || !cpf) {
+  if (!username || !password) {
     res.status(400).json({ message: 'Provide username, password, name and cpf.' });
     return;
   }
@@ -83,7 +83,7 @@ authRoutes.post('/signup', (req, res, next) => {
 
 // Login route
 
-authRoutes.post('api/login', (req, res, next) => {
+authRoutes.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, theUser, failureDetails) => {
     if (err) {
       res.status(500).json({ message: 'Something went wrong authenticating user' });
@@ -112,7 +112,7 @@ authRoutes.post('api/login', (req, res, next) => {
 
 // Logout route
 
-authRoutes.post('api/logout', (req, res, next) => {
+authRoutes.post('/logout', (req, res, next) => {
   // req.logout() is defined by passport
   req.logout();
   res.status(200).json({ message: 'Log out success!' });
