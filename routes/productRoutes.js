@@ -5,7 +5,8 @@ const productRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
 
-// first product update, on the repair side
+// product Updates along the selling journey, all the changes
+// are made base on the status change, check the switch for ref
 
 productRoutes.put('/product-status/:id', (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -35,6 +36,8 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     imageUrl
   } = req.body;
 
+  // need corrections and improvements to correctly represent the state changes
+
   switch (status) {
     case 'FirstResponse':
       Product.update({ _id: req.params.id }, {
@@ -51,9 +54,111 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
           res.status(500).json(err);
         });
       break;
+    case 'ToRepair':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+      break;
+    case 'OrderRepair':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+          repairPrice,
+          repairDescription,
+          model,
+          specs,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+      break;
+    case 'WantRepair':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+          repairPrice,
+          repairDescription,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+
+      break;
+    case 'InRepair':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+      break;
+    case 'SendCompany':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+      break;
+    case 'toStore':
+      Product.update({ _id: req.params.id }, {
+        $set: {
+          status,
+          finalDescription,
+          onSale,
+          sellingPrice,
+          totalPrice,
+          comission,
+        }
+      })
+        .then(() => {
+          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
+
+      break;
     default:
       break;
   }
 });
+
+// get all users, using for tests don't delete it yet
+
+productRoutes.get('/allusers', (req, res, next) => {
+  User.find()
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+})
+
 
 module.exports = productRoutes;
