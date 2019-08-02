@@ -77,12 +77,18 @@ app.use(cors({
 
 
 // ROUTES MIDDLEWARE STARTS HERE:
-app.use('/api', require('./routes/index'));
+// app.use('/api', require('./routes/index'));
 app.use('/api', require('./routes/authRoutes'));
 app.use('/api', require('./routes/company'));
 app.use('/api', require('./routes/userRoutes'));
 app.use('/api', require('./routes/productRoutes'));
 app.use('/api', require('./routes/cloudinaryUpload'));
 
+// INDEX.HTML
+
+app.use((req, res, next) => {
+  // If no routes match, send them the React HTML.
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 module.exports = app;
