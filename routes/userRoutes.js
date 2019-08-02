@@ -8,13 +8,13 @@ const bcrypt = require('bcrypt');
 
 // Profile
 userRoutes.get("/profile/:userID", (req, res) => {
-    const userId = req.params.userID;
-    User.findById(userId)
-      .then(profile => {
-        res.status(200).json(profile);
-      })
-      .catch(err => console.log(err));
-  }
+  const userId = req.params.userID;
+  User.findById(userId)
+    .then((profile) => {
+      res.status(200).json(profile);
+    })
+    .catch(err => console.log(err));
+}
 );
 
 userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
@@ -27,73 +27,75 @@ userRoutes.put("/profile/edit/:profileID", (req, res, next) => {
     { _id: profileID },
     { $set: { name, password: hashPass, address, city, cep } }
   )
-  .then(profile => {
-    res.status(200).json(profile);
-  })
-  .catch(error => {
-    console.log(error);
-  });
+    .then((profile) => {
+      res.status(200).json(profile);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
 });
 
 // route for the user start his sell
-userRoutes.post('/new-product', (req,res) => {
+userRoutes.post('/new-product', (req, res) => {
 
-    const { name, statusProduct, categories, path, brand, price, description, imageUrl } = req.body;
-    console.log(req.user);
+  const { name, statusProduct, categories, path, brand, model, specs, starterPrice, clientDescription, imageUrl } = req.body;
 
-    if (!name || !statusProduct || !categories || !path || !brand || !price || !description ) {
-      res.status(400).json({ message: 'Something is missing in the form.' });
-      return;
-    }
 
-    const newProduct = new Product({
-      name,
-      statusProduct,
-      categories,
-      path,
-      brand,
-      price,
-      description,
-      imageUrl,
-      owner: req.user.id
-    });
+  if (!name || !statusProduct || !categories || !path || !brand || !starterPrice || !clientDescription) {
+    res.status(400).json({ message: 'Something is missing in the form.' });
+    return;
+  }
 
-    newProduct.save()
-    .then(product => {
+  const newProduct = new Product({
+    name,
+    statusProduct,
+    categories,
+    path,
+    brand,
+    model,
+    specs,
+    starterPrice,
+    clientDescription,
+    imageUrl,
+    owner: req.user.id,
+  });
+
+  newProduct.save()
+    .then((product) => {
       res.status(200).json(product);
     })
     .catch(err => res.status(500).json({ message: err }));
 });
 
 // route that receive a Status and return all products with that status
-userRoutes.get('/status-products/:status', (req,res) => {
+userRoutes.get('/status-products/:status', (req, res) => {
   const { status } = req.params;
-  Product.find({status: status})
-  .then(products => {
-    res.status(200).json(products);
-  })
-  .catch(err => res.status(500).json({ message: "Nothing" }));
+  Product.find({ status: status })
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch(err => res.status(500).json({ message: "Nothing" }));
 });
 
 // route that receive a Categorie and return all products with that categorie
-userRoutes.get('/categorie/:categories', (req,res) => {
+userRoutes.get('/categorie/:categories', (req, res) => {
   const { categories } = req.params;
-  Product.find({categories: categories , status: 'ToStore'})
-  .then(products => {
-    res.status(200).json(products);
-  })
-  .catch(err => res.status(500).json({ message: "Nothing" }));
+  Product.find({ categories: categories, status: 'ToStore' })
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch(err => res.status(500).json({ message: "Nothing" }));
 });
 
 // route that receive a IdProduct and return him
-userRoutes.get('/product/:id', (req,res) => {
+userRoutes.get('/product/:id', (req, res) => {
   const { id } = req.params;
   Product.findById(id)
-  .then(product => {
-    res.status(200).json(product);
-  })
-  .catch(err => res.status(500).json({ message: "Nothing" }));
+    .then((product) => {
+      res.status(200).json(product);
+    })
+    .catch(err => res.status(500).json({ message: "Nothing" }));
 });
 
 module.exports = userRoutes;
