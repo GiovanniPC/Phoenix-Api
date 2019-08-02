@@ -9,10 +9,10 @@ const companySchema = new Schema(
     cnpj: String,
     address: String,
     phone: String,
-    speciality: [ {type: String} ],
-    location: { type: {type: String}, coordinates: [Number] },
-    user: { type: Schema.Types.ObjectId, ref: 'User' }
-
+    speciality: [{ type: String, enum: ['Laptop', 'Tablet', 'Mobile', 'Consoles', "TV's", 'Audio'] }],
+    location: { type: { type: String }, coordinates: [Number] },
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
+    products: { type: Schema.Types.ObjectId, ref: 'Products' },
   },
   {
     timestamps: true,
@@ -20,7 +20,7 @@ const companySchema = new Schema(
 );
 
 
-const Company = mongoose.model("Company", companySchema);
+const Company = mongoose.model('Company', companySchema);
 
 
 module.exports = Company;
