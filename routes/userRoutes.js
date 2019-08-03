@@ -48,7 +48,7 @@ userRoutes.post('/new-product', (req, res) => {
     starterPrice,
     clientDescription,
     imageUrl,
-    idCompany, // this should be passed by params?
+    idCompany,
   } = req.body;
   const { id } = req.user;
 
@@ -102,7 +102,6 @@ userRoutes.post('/new-product', (req, res) => {
           });
         })
         .catch()
-        
       break;
     default:
       break;
