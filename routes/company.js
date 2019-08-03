@@ -26,13 +26,19 @@ routes.post('/create-company', (req, res, next) => {
     coordinates: [longitude, latitude],
   };
 
+  const newSpeciality = []; 
+
+  for(key in speciality){
+     if(speciality[key])  newSpeciality.push(key)  
+  }
+
   const newCompany = new Company({
     name,
     razaosocial,
     cnpj,
     address,
     phone,
-    speciality,
+    newSpeciality,
     location,
     email,
     user: req.user.id,
