@@ -13,14 +13,17 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
-  }
+  };
+
+  if (!req.user) {
+    res.status(400).json({ message: 'Not logged' });
+    return;
+  };
 
   const {
-    name,
+    finalName,
     status,
-    statusProduct,
-    categories,
-    path,
+    finalStatusProduct,
     brand,
     model,
     specs,
@@ -29,149 +32,156 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     sellingPrice,
     comission,
     totalPrice,
-    clientDescription,
     repairDescription,
     companyDescription,
     finalDescription,
     onSale,
-    imageUrl
+    repairImageUrl,
+    repairYesNo
   } = req.body;
-
-  // need corrections and improvements to correctly represent the state changes
 
   switch (status) {
     case 'FirstResponse':
-
-      if (!starterPrice || !companyDescription) {
-        res.status(400).json({ message: 'Something is missing in the form.' });
-        return;
-      }
-
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-          starterPrice,
-          companyDescription,
+      if (req.user.role === 'Admin') {
+        if (!starterPrice || !companyDescription) {
+          res.status(400).json({ message: 'Something is missing in the form.' });
+          return;
         }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            status,
+            starterPrice,
+            companyDescription,
+          }
         })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
+
     case 'ToRepair':
-
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-        }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+      if (req.user.role === 'Costumer') {
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            status,
+          }
         })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
+
     case 'OrderRepair':
-
-      if (!repairPrice || !repairDescription || !model || !specs) {
-        res.status(400).json({ message: 'Something is missing in the form.' });
-        return;
-      }
-
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-          repairPrice,
-          repairDescription,
-          model,
-          specs,
+      if (req.user.role === 'Repair') {
+        if (!repairPrice || !repairDescription || !model || !specs || !brand || !repairImageUrl) {
+          res.status(400).json({ message: 'Something is missing in the form.' });
+          return;
         }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            status,
+            repairPrice,
+            repairDescription,
+            model,
+            specs,
+            brand,
+            repairImageUrl,
+          }
         })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
+
     case 'WantRepair':
-
-      if (!repairPrice || !repairDescription) {
-        res.status(400).json({ message: 'Something is missing in the form.' });
-        return;
-      }
-
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-          repairPrice,
-          repairDescription,
-        }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+      if (req.user.role === 'Admin') {
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            status,
+            repairYesNo,
+          }
         })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
+      break;
 
-      break;
-    case 'InRepair':
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-        }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
-        })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
-      break;
     case 'SendCompany':
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-        }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+      if (req.user.role === 'Repair') {
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            status,
+            finalStatusProduct,
+          }
         })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
+
     case 'toStore':
-
-      if (!totalPrice || !finalDescription || !comission || !sellingPrice) {
-        res.status(400).json({ message: 'Something is missing in the form.' });
-        return;
-      }
-
-      Product.update({ _id: req.params.id }, {
-        $set: {
-          status,
-          finalDescription,
-          onSale,
-          sellingPrice,
-          totalPrice,
-          comission,
+      if (req.user.role === 'Admin') {
+        if (!totalPrice || !finalDescription || !comission || !sellingPrice || !finalName) {
+          res.status(400).json({ message: 'Something is missing in the form.' });
+          return;
         }
-      })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
-        })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
 
+        Product.updateOne({ _id: req.params.id }, {
+          $set: {
+            finalName,
+            status,
+            finalDescription,
+            onSale,
+            sellingPrice,
+            totalPrice,
+            comission,
+          }
+        })
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
+
     default:
+      res.status(201).json({ message: "Status don't exist, error in the system." });
       break;
   }
 });

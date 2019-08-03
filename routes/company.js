@@ -26,13 +26,19 @@ routes.post('/create-company', (req, res, next) => {
     coordinates: [longitude, latitude],
   };
 
+  const newSpeciality = []; 
+
+  for(key in speciality){
+     if(speciality[key])  newSpeciality.push(key)  
+  }
+
   const newCompany = new Company({
     name,
     razaosocial,
     cnpj,
     address,
     phone,
-    speciality,
+    newSpeciality,
     location,
     email,
     user: req.user.id,
@@ -40,7 +46,7 @@ routes.post('/create-company', (req, res, next) => {
 
   newCompany.save()
     .then(() => {
-      User.update({ _id: req.user.id }, { $push: { company: newCompany._id } })
+      User.updateOne({ _id: req.user.id }, { $push: { company: newCompany._id } })
         .then((answer) => {
           res.status(200).json(answer);
         })

@@ -11,7 +11,7 @@ const companySchema = new Schema(
     address: String,
     phone: String,
     email: String,
-    speciality: [{ type: String, enum: ['Laptop', 'Tablet', 'Mobile', 'Consoles', "TV's", 'Audio'] }],
+    speciality: [{ type: String, enum: ['Laptop', 'Tablet', 'Mobile', 'Consoles', "TV", 'Audio'] }],
     location: { type: { type: String }, coordinates: [Number] },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     products: [{ type: Schema.Types.ObjectId, ref: 'Products' }],
