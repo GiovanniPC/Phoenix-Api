@@ -17,6 +17,7 @@ routes.post('/create-company', (req, res, next) => {
     speciality,
     phone,
     cnpj,
+    email,
   } = req.body;
 
 
@@ -33,6 +34,7 @@ routes.post('/create-company', (req, res, next) => {
     phone,
     speciality,
     location,
+    email,
     user: req.user.id,
   });
 

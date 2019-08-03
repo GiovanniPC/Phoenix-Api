@@ -195,8 +195,10 @@ productRoutes.post('/cart', (req, res, next) => {
     products,
     total,
   });
-  
-  console.log(newCart)
+
+  newCart.save()
+    .then()
+    .catch()
 
 })
 
