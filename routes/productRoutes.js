@@ -4,6 +4,7 @@ const express = require('express');
 const productRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
+const ShoppingCart = require('../models/shoppingCart');
 
 // product Updates along the selling journey, all the changes
 // are made base on the status change, check the switch for ref
@@ -195,5 +196,18 @@ productRoutes.get('/allusers', (req, res, next) => {
     .catch(err => res.status(500).json(err));
 })
 
+// routes related to the buying process
+productRoutes.post('/cart', (req, res, next) => {
+  const products = [...req.body.products];
+  const { total } = req.body;
+  const newCart = new ShoppingCart({
+    user: req.user.id,
+    products,
+    total,
+  });
+  
+  console.log(newCart)
+
+})
 
 module.exports = productRoutes;
