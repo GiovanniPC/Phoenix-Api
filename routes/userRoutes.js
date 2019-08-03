@@ -48,7 +48,7 @@ userRoutes.post('/new-product', (req, res) => {
     starterPrice,
     clientDescription,
     imageUrl,
-    idCompany, // this should be passed by params?
+    idCompany,
   } = req.body;
   const { id } = req.user;
 
@@ -90,9 +90,8 @@ userRoutes.post('/new-product', (req, res) => {
 
     case 'Repair':
       Company.findById(idCompany)
-      .then()
-      .catch()
-        transporter.sendMail({
+      .then(() => {
+                transporter.sendMail({
           from: '"Phoenix Forge" <phoenixforge@hotmail.com>',
           to: username,
           subject: 'Welcome to Phoenix Forge! Please confirm your account.',
@@ -111,6 +110,9 @@ userRoutes.post('/new-product', (req, res) => {
         <h3>Hi, there!</h3>
         <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
         });
+      })
+      .catch()
+
       break;
     default:
       break;
