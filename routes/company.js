@@ -17,6 +17,7 @@ routes.post('/create-company', (req, res, next) => {
     speciality,
     phone,
     cnpj,
+    email
   } = req.body;
 
 
@@ -33,12 +34,13 @@ routes.post('/create-company', (req, res, next) => {
     phone,
     speciality,
     location,
+    email,
     user: req.user.id,
   });
 
   newCompany.save()
     .then(() => {
-      User.update({ _id: req.user.id }, { $push: { company: newCompany._id } })
+      User.updateOne({ _id: req.user.id }, { $push: { company: newCompany._id } })
         .then((answer) => {
           res.status(200).json(answer);
         })
