@@ -4,6 +4,7 @@ const express = require('express');
 const productRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
+const ShoppingCart = require('../models/shoppingCart');
 
 // product Updates along the selling journey, all the changes
 // are made base on the status change, check the switch for ref
@@ -40,6 +41,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
 
   switch (status) {
     case 'FirstResponse':
+
+      if (!starterPrice || !companyDescription) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -55,6 +62,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'ToRepair':
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -68,6 +76,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'OrderRepair':
+
+      if (!repairPrice || !repairDescription || !model || !specs) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -85,6 +99,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'WantRepair':
+
+      if (!repairPrice || !repairDescription) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -127,6 +147,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         });
       break;
     case 'toStore':
+
+      if (!totalPrice || !finalDescription || !comission || !sellingPrice) {
+        res.status(400).json({ message: 'Something is missing in the form.' });
+        return;
+      }
+
       Product.update({ _id: req.params.id }, {
         $set: {
           status,
@@ -160,5 +186,18 @@ productRoutes.get('/allusers', (req, res, next) => {
     .catch(err => res.status(500).json(err));
 })
 
+// routes related to the buying process
+productRoutes.post('/cart', (req, res, next) => {
+  const products = [...req.body.products];
+  const { total } = req.body;
+  const newCart = new ShoppingCart({
+    user: req.user.id,
+    products,
+    total,
+  });
+  
+  console.log(newCart)
+
+})
 
 module.exports = productRoutes;
