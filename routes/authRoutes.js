@@ -42,7 +42,7 @@ authRoutes.post('/signup', (req, res, next) => {
       name,
       cpf,
       token: confirmationCode,
-      role
+      role,
     });
 
 
