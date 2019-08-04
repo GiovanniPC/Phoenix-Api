@@ -17,7 +17,7 @@ routes.post('/create-company', (req, res, next) => {
     speciality,
     phone,
     cnpj,
-    email
+    email,
   } = req.body;
 
 

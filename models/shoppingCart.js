@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const shoppingSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    products: [{ type: Schema.Types.ObjectId, ref: 'Products' }],
+    products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
     total: String,
   },
   {

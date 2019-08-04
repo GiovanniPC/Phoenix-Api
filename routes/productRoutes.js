@@ -15,7 +15,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     return;
   };
 
-  if(!req.user){
+  if (!req.user) {
     res.status(400).json({ message: 'Not logged' });
     return;
   };
@@ -37,12 +37,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     finalDescription,
     onSale,
     repairImageUrl,
-    repairYesNo
+    repairYesNo,
   } = req.body;
 
   switch (status) {
     case 'FirstResponse':
-      if(req.user.role === 'Admin'){
+      if (req.user.role === 'Admin') {
         if (!starterPrice || !companyDescription) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
@@ -62,12 +62,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products."});
+        res.status(400).json({ message: "You don't have access to update this products." });
       };
       break;
 
     case 'ToRepair':
-      if(req.user.role === 'Costumer'){
+      if (req.user.role === 'Costumer') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
@@ -79,13 +79,13 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
           .catch((err) => {
             res.status(500).json(err);
           });
-        } else {
-          res.status(400).json({ message: "You don't have access to update this products."});
-        };
+      } else {
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
 
     case 'OrderRepair':
-      if(req.user.role === 'Repair'){
+      if (req.user.role === 'Repair') {
         if (!repairPrice || !repairDescription || !model || !specs || !brand || !repairImageUrl) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
@@ -99,7 +99,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             model,
             specs,
             brand,
-            repairImageUrl
+            repairImageUrl,
           }
         })
           .then(() => {
@@ -109,31 +109,31 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products."});
+        res.status(400).json({ message: "You don't have access to update this products." });
       };
       break;
 
     case 'WantRepair':
-      if(req.user.role === 'Admin') {
+      if (req.user.role === 'Admin') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
             repairYesNo,
           }
         })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
-        })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products."});
+        res.status(400).json({ message: "You don't have access to update this products." });
       };
       break;
 
     case 'SendCompany':
-      if(req.user.role === 'Repair') {
+      if (req.user.role === 'Repair') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
@@ -147,12 +147,12 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products."});
+        res.status(400).json({ message: "You don't have access to update this products." });
       };
       break;
 
     case 'toStore':
-      if(req.user.role === 'Admin') {
+      if (req.user.role === 'Admin') {
         if (!totalPrice || !finalDescription || !comission || !sellingPrice || !finalName) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
@@ -169,19 +169,19 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             comission,
           }
         })
-        .then(() => {
-          res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
-        })
-        .catch((err) => {
-          res.status(500).json(err);
-        });
+          .then(() => {
+            res.status(200).json({ message: `Product with ${req.params.id} is updated successfully.` });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products."});
-      };  
+        res.status(400).json({ message: "You don't have access to update this products." });
+      };
       break;
 
     default:
-      res.status(201).json({ message: "Status don't exist, error in the system."});
+      res.status(201).json({ message: "Status don't exist, error in the system." });
       break;
   }
 });
@@ -190,24 +190,71 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
 
 productRoutes.get('/allusers', (req, res, next) => {
   User.find()
+    .populate('company')
     .then((answer) => {
       res.status(200).json(answer);
     })
     .catch(err => res.status(500).json(err));
 })
 
-// routes related to the buying process
+// Create a shoppingCart on user checkout to payment
 productRoutes.post('/cart', (req, res, next) => {
-  const products = [...req.body.products];
-  const { total } = req.body;
+  const { total, products } = req.body;
   const newCart = new ShoppingCart({
     user: req.user.id,
     products,
     total,
   });
-  
-  console.log(newCart)
 
+  newCart.save()
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err))
+});
+
+// edit the shoppingCart
+
+productRoutes.put('/cart-edit/:id', (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ message: 'Specified id is not valid' });
+    return;
+  }
+
+  const { total, products } = req.body;
+
+  ShoppingCart.update({ _id: req.params.id }, { $set: { products, total } })
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+});
+
+// find user shoppingCart
+
+productRoutes.get('/myCart', (req, res, next) => {
+  ShoppingCart.find({ user: req.user.id })
+    .populate('products')
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+});
+
+// delete shopping cart
+
+productRoutes.delete('/delete-cart/:id', (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ message: 'Specified id is not valid' });
+    return;
+  }
+
+  ShoppingCart.findByIdAndRemove(req.params.id)
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
 })
 
 module.exports = productRoutes;
+
