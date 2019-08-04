@@ -27,7 +27,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     brand,
     model,
     specs,
-    starterPrice,
+    responsePrice,
     repairPrice,
     sellingPrice,
     comission,
@@ -51,7 +51,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
-            starterPrice,
+            responsePrice,
             companyDescription,
           }
         })

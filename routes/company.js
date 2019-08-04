@@ -38,7 +38,7 @@ routes.post('/create-company', (req, res, next) => {
     cnpj,
     address,
     phone,
-    newSpeciality,
+    speciality: newSpeciality,
     location,
     email,
     user: req.user.id,
