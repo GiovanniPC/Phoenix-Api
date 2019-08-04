@@ -37,7 +37,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
     finalDescription,
     onSale,
     repairImageUrl,
-    repairYesNo
+    repairYesNo,
   } = req.body;
 
   switch (status) {
@@ -190,16 +190,16 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
 
 productRoutes.get('/allusers', (req, res, next) => {
   User.find()
+    .populate('company')
     .then((answer) => {
       res.status(200).json(answer);
     })
     .catch(err => res.status(500).json(err));
 })
 
-// routes related to the buying process
+// Create a shoppingCart on user checkout to payment
 productRoutes.post('/cart', (req, res, next) => {
-  const products = [...req.body.products];
-  const { total } = req.body;
+  const { total, products } = req.body;
   const newCart = new ShoppingCart({
     user: req.user.id,
     products,
@@ -207,9 +207,54 @@ productRoutes.post('/cart', (req, res, next) => {
   });
 
   newCart.save()
-    .then()
-    .catch()
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err))
+});
 
+// edit the shoppingCart
+
+productRoutes.put('/cart-edit/:id', (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ message: 'Specified id is not valid' });
+    return;
+  }
+
+  const { total, products } = req.body;
+
+  ShoppingCart.update({ _id: req.params.id }, { $set: { products, total } })
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+});
+
+// find user shoppingCart
+
+productRoutes.get('/myCart', (req, res, next) => {
+  ShoppingCart.find({ user: req.user.id })
+    .populate('products')
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+});
+
+// delete shopping cart
+
+productRoutes.delete('/delete-cart/:id', (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ message: 'Specified id is not valid' });
+    return;
+  }
+
+  ShoppingCart.findByIdAndRemove(req.params.id)
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
 })
 
 module.exports = productRoutes;
+
