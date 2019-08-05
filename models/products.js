@@ -15,6 +15,7 @@ const productSchema = new Schema(
     model: String,
     specs: String,
     starterPrice: String,
+    responsePrice: String,
     repairPrice: String,
     sellingPrice: String,
     comission: String,
