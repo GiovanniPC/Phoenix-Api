@@ -4,10 +4,11 @@ const routes = express.Router();
 const mongoose = require('mongoose');
 const Company = require('../models/company');
 const User = require('../models/user');
+const ensureAuthenticated = require('../configs/authenticated');
 
 // create new company and create a relation to the user model
 
-routes.post('/create-company', (req, res, next) => {
+routes.post('/create-company', ensureAuthenticated, (req, res, next) => {
   const {
     name,
     razaosocial,
@@ -38,7 +39,7 @@ routes.post('/create-company', (req, res, next) => {
     cnpj,
     address,
     phone,
-    newSpeciality,
+    speciality: newSpeciality,
     location,
     email,
     user: req.user.id,
@@ -60,7 +61,7 @@ routes.post('/create-company', (req, res, next) => {
 
 // edit the company information the company
 
-routes.put('/edit-company/:id', (req, res, next) => {
+routes.put('/edit-company/:id', ensureAuthenticated, (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
@@ -103,7 +104,7 @@ routes.put('/edit-company/:id', (req, res, next) => {
 
 
 // get companies by user
-routes.get('/get-company', (req, res, next) => {
+routes.get('/get-company', ensureAuthenticated, (req, res, next) => {
   User.findOne({ _id: req.user.id })
     .populate('company')
     .then((answer) => {
@@ -114,7 +115,7 @@ routes.get('/get-company', (req, res, next) => {
 
 // get the user companie and the products related to it, use it for the repair store side 
 
-routes.get('/get-products', (req, res, next) => {
+routes.get('/get-products', ensureAuthenticated, (req, res, next) => {
   Company.findOne({ user: req.user.id })
     .populate('Products')
     .then((answer) => {

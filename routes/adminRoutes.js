@@ -4,10 +4,14 @@ const adminRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
 const Company = require('../models/company');
+const ensureAuthenticated = require('../configs/authenticated');
+const isRole = require('../configs/roleAuthenticated');
 
 // get all companies
 
-adminRoutes.get('/companies/all', (req, res, next) => {
+
+adminRoutes.get('/companies/all', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
+
   Company.find()
     .then((answer) => {
       res.status(200).json(answer);
@@ -18,7 +22,8 @@ adminRoutes.get('/companies/all', (req, res, next) => {
 
 // get specific company
 
-adminRoutes.get('/companies/:id', (req, res, next) => {
+adminRoutes.get('/companies/:id', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
+
   Company.findOne({ _id: req.params.id })
     .populate('Products')
     .then((answer) => {
@@ -30,7 +35,7 @@ adminRoutes.get('/companies/:id', (req, res, next) => {
 
 // get all products
 
-adminRoutes.get('/products/all', (req, res, next) => {
+adminRoutes.get('/products/all', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
   Product.find()
     .then((answer) => {
       res.status(200).json(answer);
