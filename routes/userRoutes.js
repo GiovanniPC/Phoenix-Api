@@ -6,9 +6,10 @@ const Product = require('../models/products');
 const User = require('../models/user');
 const Company = require('../models/company');
 const transporter = require('../configs/nodemailer');
+const ensureAuthenticated = require('../configs/authenticated');
 
 // Profile
-userRoutes.get('/profile/:userID', (req, res) => {
+userRoutes.get('/profile/:userID', ensureAuthenticated, (req, res) => {
   const userId = req.params.userID;
   User.findById(userId).populate('product')
     .then((profile) => {
@@ -17,7 +18,7 @@ userRoutes.get('/profile/:userID', (req, res) => {
     .catch(err => console.log(err));
 });
 
-userRoutes.put('/profile/edit/:profileID', (req, res, next) => {
+userRoutes.put('/profile/edit/:profileID', ensureAuthenticated, (req, res, next) => {
   const { profileID } = req.params;
   const { password, name, address, city, cep } = req.body;
   const salt = bcrypt.genSaltSync(10);
@@ -36,7 +37,7 @@ userRoutes.put('/profile/edit/:profileID', (req, res, next) => {
 });
 
 // route for the user start his sell
-userRoutes.post('/new-product', (req, res) => {
+userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
 
   const {
     name,
@@ -110,7 +111,7 @@ userRoutes.post('/new-product', (req, res) => {
 });
 
 // route that receive a Status and return all products with that status
-userRoutes.get('/status-products/:status', (req, res) => {
+userRoutes.get('/status-products/:status', ensureAuthenticated, (req, res) => {
   const { status } = req.params;
   Product.find({ status: status })
     .then((products) => {
@@ -120,7 +121,7 @@ userRoutes.get('/status-products/:status', (req, res) => {
 });
 
 // route that receive a Categorie and return all products with that categorie
-userRoutes.get('/categorie/:categories', (req, res) => {
+userRoutes.get('/categorie/:categories', ensureAuthenticated, (req, res) => {
   const { categories } = req.params;
   Product.find({ categories: categories, status: 'ToStore' })
     .then((products) => {
@@ -130,7 +131,7 @@ userRoutes.get('/categorie/:categories', (req, res) => {
 });
 
 // route that receive a IdProduct and return him
-userRoutes.get('/product/:id', (req, res) => {
+userRoutes.get('/product/:id', ensureAuthenticated, (req, res) => {
   const { id } = req.params;
   Product.findById(id)
     .then((product) => {
@@ -139,7 +140,7 @@ userRoutes.get('/product/:id', (req, res) => {
     .catch(err => res.status(500).json({ message: 'Nothing' }));
 });
 
-userRoutes.get('/client-products/:id', (req, res) => {
+userRoutes.get('/client-products/:id', ensureAuthenticated, (req, res) => {
   const { id } = req.params;
   User.findById(id).populate('product')
     .then((products) => {
