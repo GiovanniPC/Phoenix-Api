@@ -9,6 +9,7 @@ const isRole = require('../configs/roleAuthenticated');
 
 // get all companies
 
+
 adminRoutes.get('/companies/all', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
 
   Company.find()
@@ -17,6 +18,7 @@ adminRoutes.get('/companies/all', ensureAuthenticated, isRole('Admin'), (req, re
     })
     .catch(err => res.status(500).json(err));
 });
+
 
 // get specific company
 
@@ -29,6 +31,7 @@ adminRoutes.get('/companies/:id', ensureAuthenticated, isRole('Admin'), (req, re
     })
     .catch(err => console.log(err))
 });
+
 
 // get all products
 

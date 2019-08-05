@@ -232,8 +232,10 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
 
 // find user shoppingCart
 
+
 productRoutes.get('/myCart', ensureAuthenticated, (req, res, next) => {
-  ShoppingCart.find({ user: req.user.id })
+  ShoppingCart
+    .find({ user: req.user.id })
     .populate('products')
     .then((answer) => {
       res.status(200).json(answer);
