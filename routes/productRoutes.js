@@ -67,7 +67,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
       break;
 
     case 'ToRepair':
-      if (req.user.role === 'Costumer') {
+      if (req.user.role === 'Customer') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
@@ -198,7 +198,7 @@ productRoutes.get('/allusers', (req, res, next) => {
 })
 
 // Create a shoppingCart on user checkout to payment
-productRoutes.post('/cart', (req, res, next) => {
+productRoutes.post('/cart', ensureAuthenticated, (req, res, next) => {
   const { total, products } = req.body;
   const newCart = new ShoppingCart({
     user: req.user.id,
@@ -215,7 +215,7 @@ productRoutes.post('/cart', (req, res, next) => {
 
 // edit the shoppingCart
 
-productRoutes.put('/cart-edit/:id', (req, res, next) => {
+productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
@@ -232,7 +232,7 @@ productRoutes.put('/cart-edit/:id', (req, res, next) => {
 
 // find user shoppingCart
 
-productRoutes.get('/myCart', (req, res, next) => {
+productRoutes.get('/myCart', ensureAuthenticated, (req, res, next) => {
   ShoppingCart.find({ user: req.user.id })
     .populate('products')
     .then((answer) => {
@@ -243,7 +243,7 @@ productRoutes.get('/myCart', (req, res, next) => {
 
 // delete shopping cart
 
-productRoutes.delete('/delete-cart/:id', (req, res, next) => {
+productRoutes.delete('/delete-cart/:id', ensureAuthenticated, (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
