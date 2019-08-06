@@ -5,6 +5,7 @@ const productRoutes = express.Router();
 const Product = require('../models/products');
 const User = require('../models/user');
 const ShoppingCart = require('../models/shoppingCart');
+const ensureAuthenticated = require('../configs/authenticated')
 
 // product Updates along the selling journey, all the changes
 // are made base on the status change, check the switch for ref
@@ -43,7 +44,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
   switch (status) {
     case 'FirstResponse':
       if (req.user.role === 'Admin') {
-        if (!starterPrice || !companyDescription) {
+        if (!responsePrice || !companyDescription) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
         }
@@ -85,7 +86,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
       break;
 
     case 'OrderRepair':
-      if (req.user.role === 'Repair') {
+      if (req.user.role === 'Company') {
         if (!repairPrice || !repairDescription || !model || !specs || !brand || !repairImageUrl) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
@@ -133,7 +134,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
       break;
 
     case 'SendCompany':
-      if (req.user.role === 'Repair') {
+      if (req.user.role === 'Company') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,
@@ -186,6 +187,16 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
   }
 });
 
+
+productRoutes.get('/myproducts', (req, res, next) => {
+  User.findById(req.user.id)
+    .populate('products')
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(err => res.status(500).json(err));
+})
+
 // get all users, using for tests don't delete it yet
 
 productRoutes.get('/allusers', (req, res, next) => {
@@ -197,18 +208,27 @@ productRoutes.get('/allusers', (req, res, next) => {
     .catch(err => res.status(500).json(err));
 })
 
-// Create a shoppingCart on user checkout to payment
+// Create a shoppingCart and push to the user cart array, require the user to be loggedin
 productRoutes.post('/cart', ensureAuthenticated, (req, res, next) => {
   const { total, products } = req.body;
+
+  if (!products || !total) {
+    res.status(500).json({ message: 'Your shopping cart is empty' });
+    return;
+  }
+
   const newCart = new ShoppingCart({
     user: req.user.id,
     products,
     total,
   });
 
+
   newCart.save()
     .then((answer) => {
-      res.status(200).json(answer);
+      User.updateOne({ _id: req.user.id }, { $push: { shoppingCart: answer._id } })
+        .then((answer) => { res.status(200).json(answer); })
+        .catch(err => res.status(500).json(err))
     })
     .catch(err => res.status(500).json(err))
 });
@@ -221,29 +241,92 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
     return;
   }
 
-  const { total, products } = req.body;
+  const { total, products, status } = req.body;
 
-  ShoppingCart.update({ _id: req.params.id }, { $set: { products, total } })
-    .then((answer) => {
-      res.status(200).json(answer);
-    })
-    .catch(err => res.status(500).json(err));
+  // if the user remove all the itens from the shopping cart the cart is deleted
+  // and teh cart will be removed from the cart array
+
+  if (!products) {
+    ShoppingCart.findByIdAndRemove(req.params.id)
+      .then((answer) => {
+        User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
+          .then((update) => { res.status(200).json(update); })
+          .catch(err => res.status(500).json(err))
+      })
+      .catch(err => res.status(500).json(err));
+    return;
+  }
+
+  if (!status) {
+    // First entrance will only edit the cart without status change
+
+    ShoppingCart.update({ _id: req.params.id }, { $set: { products, total } })
+      .then((answer) => {
+        res.status(200).json(answer);
+      })
+      .catch(err => res.status(500).json(err));
+  } else if (status === 'pendingPayment') {
+    // Second entrance will change when the user start the payment process
+
+    ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
+      .then((answer) => {
+        res.status(200).json(answer);
+      })
+      .catch(err => res.status(500).json(err));
+  } else if (status === 'Purchased') {
+    // Last state will happen when the payment is confirmed
+    // changing the status of the products in the cart to sold
+    // and remove the cart from the shopping cart array
+
+    ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
+      .then(() => {
+        ShoppingCart
+          .findById(req.params.id)
+          .populate('products')
+          .then((answer) => {
+            answer.products.forEach((item) => {
+              Product.update({ _id: item._id }, { $set: { status: 'toStore' } })
+                .then(() => {
+                  User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
+                    .then((update) => { res.status(200).json(update); })
+                    .catch(err => res.status(500).json(err))
+                })
+                .catch(err => res.status(500).json(err))
+            });
+          })
+          .catch(err => res.status(500).json(err));
+      })
+      .catch(err => res.status(500).json(err));
+  }
 });
 
-// find user shoppingCart
 
+// find user shoppingCart, will not display the purchased carts
 
 productRoutes.get('/myCart', ensureAuthenticated, (req, res, next) => {
   ShoppingCart
     .find({ user: req.user.id })
     .populate('products')
     .then((answer) => {
-      res.status(200).json(answer);
+      res.status(200).json(answer.filter(item => item.status !== 'Purchased'));
     })
     .catch(err => res.status(500).json(err));
 });
 
-// delete shopping cart
+
+// Find all the purchased products
+
+productRoutes.get('/myPurchases', ensureAuthenticated, (req, res, next) => {
+  ShoppingCart
+    .find({ user: req.user.id })
+    .populate('products')
+    .then((answer) => {
+      res.status(200).json(answer.filter(item => item.status === 'Purchased').map(item => item.products));
+    })
+    .catch(err => res.status(500).json(err));
+});
+
+// delete the shopping cart
 
 productRoutes.delete('/delete-cart/:id', ensureAuthenticated, (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -253,10 +336,11 @@ productRoutes.delete('/delete-cart/:id', ensureAuthenticated, (req, res, next) =
 
   ShoppingCart.findByIdAndRemove(req.params.id)
     .then((answer) => {
-      res.status(200).json(answer);
+      User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
+        .then((update) => { res.status(200).json(update); })
+        .catch(err => res.status(500).json(err))
     })
     .catch(err => res.status(500).json(err));
 })
 
 module.exports = productRoutes;
-

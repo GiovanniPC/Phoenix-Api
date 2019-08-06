@@ -20,13 +20,19 @@ userRoutes.get('/profile/:userID', ensureAuthenticated, (req, res) => {
 
 userRoutes.put('/profile/edit/:profileID', ensureAuthenticated, (req, res, next) => {
   const { profileID } = req.params;
-  const { password, name, address, city, cep } = req.body;
+  const {
+    password, name, address, city, cep,
+  } = req.body;
   const salt = bcrypt.genSaltSync(10);
   const hashPass = bcrypt.hashSync(password, salt);
 
   User.updateOne(
     { _id: profileID },
-    { $set: { name, password: hashPass, address, city, cep } }
+    {
+ $set: {
+      name, password: hashPass, address, city, cep,
+    } 
+},
   )
     .then((profile) => {
       res.status(200).json(profile);
@@ -38,7 +44,6 @@ userRoutes.put('/profile/edit/:profileID', ensureAuthenticated, (req, res, next)
 
 // route for the user start his sell
 userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
-
   const {
     name,
     statusProduct,
@@ -102,18 +107,17 @@ userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
             <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
           });
         })
-        .catch()
+        .catch();
       break;
     default:
       break;
   }
-
 });
 
 // route that receive a Status and return all products with that status
 userRoutes.get('/status-products/:status', ensureAuthenticated, (req, res) => {
   const { status } = req.params;
-  Product.find({ status: status })
+  Product.find({ status })
     .then((products) => {
       res.status(200).json(products);
     })
@@ -123,7 +127,7 @@ userRoutes.get('/status-products/:status', ensureAuthenticated, (req, res) => {
 // route that receive a Categorie and return all products with that categorie
 userRoutes.get('/categorie/:categories', ensureAuthenticated, (req, res) => {
   const { categories } = req.params;
-  Product.find({ categories: categories, status: 'ToStore' })
+  Product.find({ categories, status: 'ToStore' })
     .then((products) => {
       res.status(200).json(products);
     })
@@ -140,13 +144,20 @@ userRoutes.get('/product/:id', ensureAuthenticated, (req, res) => {
     .catch(err => res.status(500).json({ message: 'Nothing' }));
 });
 
-userRoutes.get('/client-products/:id', ensureAuthenticated, (req, res) => {
-  const { id } = req.params;
-  User.findById(id).populate('product')
-    .then((products) => {
-      res.status(200).json(products);
-    })
-    .catch(err => res.status(500).json({ message: 'Nothing' }));
+userRoutes.get('/client-products', ensureAuthenticated, (req, res) => {
+  if (req.user.role === 'Customer') {
+    User.findById(req.user.id).populate({ path: 'product', populate: { path: 'idCompany' } })
+      .then((products) => {
+        res.status(200).json(products);
+      })
+      .catch(err => res.status(500).json({ message: 'Nothing' }));
+  } else if (req.user.role === 'Company') {
+    User.findById(req.user.id).populate({ path: 'company', populate: { path: 'products' } })
+      .then((products) => {
+        res.status(200).json(products);
+      })
+      .catch(err => res.status(500).json({ message: 'Nothing' }));
+  }
 });
 
 module.exports = userRoutes;
