@@ -28,10 +28,12 @@ routes.post('/create-company', ensureAuthenticated, (req, res, next) => {
     coordinates: [longitude, latitude],
   };
 
-  const newSpeciality = []; 
+  const newSpeciality = [];
 
-  for(key in speciality){
-     if(speciality[key])  newSpeciality.push(key)  
+  for (key in speciality) {
+    if (speciality[key]) {
+      newSpeciality.push(key)
+    };
   }
 
   const newCompany = new Company({
@@ -97,6 +99,7 @@ routes.put('/edit-company/:id', ensureAuthenticated, (req, res, next) => {
       cnpj,
       cep,
     }
+
   })
     .then(() => {
       res.status(200).json({ message: `Company with ${req.params.id} is updated successfully.` });
@@ -112,12 +115,12 @@ routes.get('/get-company', ensureAuthenticated, (req, res, next) => {
   User.findOne({ _id: req.user.id })
     .populate('company')
     .then((answer) => {
-      res.status(200).json(answer)
+      res.status(200).json(answer);
     })
-    .catch(err => console.log(err))
-})
+    .catch(err => console.log(err));
+});
 
-// get the user companie and the products related to it, use it for the repair store side 
+// get the user companie and the products related to it, use it for the repair store side
 
 routes.get('/get-products', ensureAuthenticated, (req, res, next) => {
   Company.findOne({ user: req.user.id })
@@ -125,7 +128,7 @@ routes.get('/get-products', ensureAuthenticated, (req, res, next) => {
     .then((answer) => {
       res.status(200).json(answer);
     })
-    .catch(err => console.log(err))
+    .catch(err => console.log(err));
 });
 
 module.exports = routes;

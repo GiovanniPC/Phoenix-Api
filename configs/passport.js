@@ -36,7 +36,7 @@ passport.use(new LocalStrategy((username, password, next) => {
     }
 
     next(null, foundUser);
-  });
+  }).populate('product');
 }));
 
 
