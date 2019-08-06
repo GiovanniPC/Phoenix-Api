@@ -6,7 +6,7 @@ const userSchema = new Schema(
   {
     username: { type: String, unique: true },
     password: String,
-    role: { type: String, enum: ['Customer', 'Company', 'Admin'], default: 'Customer'},
+    role: { type: String, enum: ['Customer', 'Company', 'Admin'], default: 'Customer' },
     name: String,
     status: { type: String, enum: ['Active', 'Pending'], default: 'Pending' },
     address: String,
@@ -16,6 +16,7 @@ const userSchema = new Schema(
     token: String,
     product: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
     company: [{ type: Schema.Types.ObjectId, ref: 'Company' }],
+    shoppingCart: [{ type: Schema.Types.ObjectId, ref: 'ShoppingCart' }],
   },
   {
     timestamps: true,
