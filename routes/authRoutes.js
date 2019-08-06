@@ -118,4 +118,14 @@ authRoutes.get('/loggedin', (req, res, next) => {
   res.status(403).json({ message: 'Unauthorized' });
 });
 
+
+authRoutes.get('/confirm/:id', (req, res, next) => {
+  User.findOneAndUpdate({ token: req.params.id }, { $set: { status: 'Active' }})
+    .then((answer) => {
+      res.status(200).json(answer);
+    })
+    .catch(() => res.status(500).json({ message: 'Confirmation failed.' }))      
+})
+
+
 module.exports = authRoutes;
