@@ -99,13 +99,15 @@ userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
       Company.findById(idCompany)
         .then((answer) => {
           transporter.sendMail({
-            from: '"Phoenix Forge" <phoenixforge@hotmail.com>',
+            from: '"Phoenix Forge" <phixit@gin.ink>',
             to: answer.username,
-            subject: 'Welcome to Phoenix Forge! Please confirm your account.',
-            text: `Please, click on the link below to confirm your account: ${process.env.BASE_URL}/${confirmationCode}`,
+            subject: `${answer.name}! Here comes a new request!`,
+            text: 'Solicitation Email',
             html: `
-            <h3>Hi, there!</h3>
-            <p>Please, click <a href="${process.env.BASE_URL}/${confirmationCode}" target="_blank">here</a> to confirm your account.</p>`,
+            
+
+            
+            `,
           });
         })
         .catch();
