@@ -28,7 +28,8 @@ const productSchema = new Schema(
     repairYesNo: String,
     imageUrl: [{ type: String, default: 'http://static.cmsi-id.com/product/01032016/pt-cahayatiara-mustika-scientific-indonesia_5tqwe_244.png'}],
     repairImageUrl: [{ type: String, default: 'http://static.cmsi-id.com/product/01032016/pt-cahayatiara-mustika-scientific-indonesia_5tqwe_244.png'}],
-    owner: { type: Schema.Types.ObjectId, ref: 'User' }
+    owner: { type: Schema.Types.ObjectId, ref: 'User' },
+    idCompany: { type: Schema.Types.ObjectId, ref: 'Company' },
   },
   {
     timestamps: true,

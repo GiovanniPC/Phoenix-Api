@@ -43,8 +43,8 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
   switch (status) {
     case 'FirstResponse':
       if (req.user.role === 'Admin') {
-        if (!starterPrice || !companyDescription) {
-          res.status(400).json({ message: 'Something is missing in the form.' });
+        if (!responsePrice || !companyDescription) {
+          res.status(401).json({ message: 'Something is missing in the form.' });
           return;
         }
 
@@ -62,7 +62,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products." });
+        res.status(411).json({ message: "You don't have access to update this products." });
       };
       break;
 
@@ -85,7 +85,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
       break;
 
     case 'OrderRepair':
-      if (req.user.role === 'Repair') {
+      if (req.user.role === 'Company') {
         if (!repairPrice || !repairDescription || !model || !specs || !brand || !repairImageUrl) {
           res.status(400).json({ message: 'Something is missing in the form.' });
           return;
@@ -133,7 +133,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
       break;
 
     case 'SendCompany':
-      if (req.user.role === 'Repair') {
+      if (req.user.role === 'Company') {
         Product.updateOne({ _id: req.params.id }, {
           $set: {
             status,

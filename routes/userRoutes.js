@@ -68,6 +68,7 @@ userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
     starterPrice,
     clientDescription,
     imageUrl,
+    idCompany,
     owner: req.user.id,
   });
 
@@ -140,13 +141,20 @@ userRoutes.get('/product/:id', ensureAuthenticated, (req, res) => {
     .catch(err => res.status(500).json({ message: 'Nothing' }));
 });
 
-userRoutes.get('/client-products/:id', ensureAuthenticated, (req, res) => {
-  const { id } = req.params;
-  User.findById(id).populate('product')
-    .then((products) => {
-      res.status(200).json(products);
-    })
-    .catch(err => res.status(500).json({ message: 'Nothing' }));
-});
+userRoutes.get('/client-products', ensureAuthenticated, (req, res) => {
+  if (req.user.role === 'Customer') {
+    User.findById(req.user.id).populate({ path: 'product', populate: { path: 'idCompany' } })
+      .then((products) => {
+        res.status(200).json(products);
+      })
+      .catch(err => res.status(500).json({ message: 'Nothing' }));
+  } else if (req.user.role === 'Company') {
+    User.findById(req.user.id).populate({ path: 'company', populate: { path: 'products' } })
+      .then((products) => {
+        res.status(200).json(products);
+      })
+      .catch(err => res.status(500).json({ message: 'Nothing' }));
+  }
+ });
 
 module.exports = userRoutes;
