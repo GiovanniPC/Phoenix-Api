@@ -19,6 +19,7 @@ routes.post('/create-company', ensureAuthenticated, (req, res, next) => {
     phone,
     cnpj,
     email,
+    cep,
   } = req.body;
 
 
@@ -41,6 +42,7 @@ routes.post('/create-company', ensureAuthenticated, (req, res, next) => {
     cnpj,
     address,
     phone,
+    cep,
     speciality: newSpeciality,
     location,
     email,
@@ -78,6 +80,7 @@ routes.put('/edit-company/:id', ensureAuthenticated, (req, res, next) => {
     speciality,
     phone,
     cnpj,
+    cep,
   } = req.body;
 
   const location = {
@@ -94,7 +97,9 @@ routes.put('/edit-company/:id', ensureAuthenticated, (req, res, next) => {
       speciality,
       phone,
       cnpj,
-    },
+      cep,
+    }
+
   })
     .then(() => {
       res.status(200).json({ message: `Company with ${req.params.id} is updated successfully.` });
