@@ -28,6 +28,11 @@ routes.post('/create-company', ensureAuthenticated, (req, res, next) => {
     coordinates: [longitude, latitude],
   };
 
+  if (!name || !razaosocial || !address || !speciality || !phone || !cnpj || !email ) {
+    res.status(400).json({ message: 'Something is missing in the form.' });
+    return;
+  }
+
   const newSpeciality = []; 
 
   for(key in speciality){
