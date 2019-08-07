@@ -63,7 +63,7 @@ productRoutes.put('/product-status/:id', (req, res, next) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(400).json({ message: "You don't have access to update this products." });
+        res.status(411).json({ message: "You don't have access to update this products." });
       };
       break;
 

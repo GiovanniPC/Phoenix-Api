@@ -73,6 +73,7 @@ userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
     starterPrice,
     clientDescription,
     imageUrl,
+    idCompany,
     owner: req.user.id,
   });
 
@@ -603,5 +604,6 @@ userRoutes.get('/client-products', ensureAuthenticated, (req, res) => {
       .catch(err => res.status(500).json({ message: 'Nothing' }));
   }
 });
+
 
 module.exports = userRoutes;
