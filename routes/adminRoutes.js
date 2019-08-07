@@ -10,6 +10,7 @@ const isRole = require('../configs/roleAuthenticated');
 // get all companies
 
 
+
 adminRoutes.get('/companies/all', ensureAuthenticated, (req, res, next) => {
   Company.find()
     .then((answer) => {
