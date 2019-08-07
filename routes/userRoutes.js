@@ -560,7 +560,7 @@ userRoutes.post('/new-product', ensureAuthenticated, (req, res) => {
 });
 
 // route that receive a Status and return all products with that status
-userRoutes.get('/status-products/:status', ensureAuthenticated, (req, res) => {
+userRoutes.get('/status-products/:status', (req, res) => {
   const { status } = req.params;
   Product.find({ status })
     .then((products) => {
