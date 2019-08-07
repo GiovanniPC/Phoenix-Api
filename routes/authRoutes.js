@@ -210,7 +210,7 @@ authRoutes.post('/signup', (req, res, next) => {
                               </tr>
                               <tr>
                                 <td class="headline">
-                                  Hey!
+                                ${name}, Welcome to Phix! 
                                 </td>
                               </tr>
                               <tr>
