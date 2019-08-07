@@ -285,7 +285,7 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
           .populate('products')
           .then((answer) => {
             answer.products.forEach((item) => {
-              Product.update({ _id: item._id }, { $set: { status: 'toStore' } })
+              Product.update({ _id: item._id }, { $set: { status: 'Sold' } })
                 .then(() => {
                   User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
                     .then((update) => { res.status(200).json(update); })
