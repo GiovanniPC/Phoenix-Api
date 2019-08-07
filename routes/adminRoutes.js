@@ -11,7 +11,7 @@ const isRole = require('../configs/roleAuthenticated');
 
 
 
-adminRoutes.get('/companies/all', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
+adminRoutes.get('/companies/all', ensureAuthenticated, (req, res, next) => {
   Company.find()
     .then((answer) => {
       res.status(200).json(answer);

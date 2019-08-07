@@ -130,7 +130,7 @@ userRoutes.get('/status-products/:status', ensureAuthenticated, (req, res) => {
 // route that receive a Categorie and return all products with that categorie
 userRoutes.get('/categorie/:categories', ensureAuthenticated, (req, res) => {
   const { categories } = req.params;
-  Product.find({ categories, status: 'ToStore' })
+  Product.find({ categories, status: 'toStore' })
     .then((products) => {
       res.status(200).json(products);
     })
