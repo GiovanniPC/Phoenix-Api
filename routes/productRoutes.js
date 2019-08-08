@@ -241,63 +241,28 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
     return;
   }
 
-  const { total, products, status } = req.body;
+  const { status } = req.body;
 
-  // if the user remove all the itens from the shopping cart the cart is deleted
-  // and teh cart will be removed from the cart array
-
-  if (!products) {
-    ShoppingCart.findByIdAndRemove(req.params.id)
-      .then((answer) => {
-        User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
-          .then((update) => { res.status(200).json(update); })
-          .catch(err => res.status(500).json(err))
-      })
-      .catch(err => res.status(500).json(err));
-    return;
-  }
-
-  if (!status) {
-    // First entrance will only edit the cart without status change
-
-    ShoppingCart.update({ _id: req.params.id }, { $set: { products, total } })
-      .then((answer) => {
-        res.status(200).json(answer);
-      })
-      .catch(err => res.status(500).json(err));
-  } else if (status === 'pendingPayment') {
-    // Second entrance will change when the user start the payment process
-
-    ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
-      .then((answer) => {
-        res.status(200).json(answer);
-      })
-      .catch(err => res.status(500).json(err));
-  } else if (status === 'Purchased') {
-    // Last state will happen when the payment is confirmed
-    // changing the status of the products in the cart to sold
-    // and remove the cart from the shopping cart array
-
-    ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
-      .then(() => {
-        ShoppingCart
-          .findById(req.params.id)
-          .populate('products')
-          .then((answer) => {
-            answer.products.forEach((item) => {
-              Product.update({ _id: item._id }, { $set: { status: 'Sold' } })
-                .then(() => {
-                  User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
-                    .then((update) => { res.status(200).json(update); })
-                    .catch(err => res.status(500).json(err))
-                })
-                .catch(err => res.status(500).json(err))
-            });
-          })
-          .catch(err => res.status(500).json(err));
-      })
-      .catch(err => res.status(500).json(err));
-  }
+  ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
+    .then(() => {
+      ShoppingCart
+        .findById(req.params.id)
+        .populate('products')
+        .then((answer) => {
+          answer.products.forEach((item) => {
+            Product.update({ _id: item._id }, { $set: { status: 'Sold' } })
+              .then(() => {
+                User.updateOne({ _id: req.user.id }, { $pullAll: { shoppingCart: [answer._id] } })
+                  .then((update) => { res.status(200).json(update); })
+                  .catch(err => res.status(500).json(err))
+              })
+              .catch(err => res.status(500).json(err))
+          });
+        })
+        .catch(err => res.status(500).json(err));
+    })
+    .catch(err => res.status(500).json(err));
+}
 });
 
 

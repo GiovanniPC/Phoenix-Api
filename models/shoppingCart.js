@@ -6,7 +6,7 @@ const shoppingSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
-    status: { type: String, enum: ['Open', 'pendingPayment', 'Purchased'], default: 'Open' },
+    status: { type: String, enum: ['Open', 'Purchased'], default: 'Open' },
     total: String,
   },
   {
