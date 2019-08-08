@@ -9,6 +9,49 @@ const transporter = require('../configs/nodemailer');
 const ensureAuthenticated = require('../configs/authenticated');
 
 // Profile
+userRoutes.put('/profile/edit/:profileID', ensureAuthenticated, (req, res, next) => {
+  const { profileID } = req.params;
+  const {
+    password, name, address, city, cep, cpf,
+  } = req.body;
+
+  if(password === undefined){
+    User.updateOne(
+      { _id: profileID },
+      {
+        $set: {
+          name, address, city, cep, cpf
+        }
+      },
+    )
+      .then((profile) => {
+        res.status(200).json(profile);
+      })
+      .catch((error) => {
+        res.status(501).json(profile);
+      });
+  } else {
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashPass = bcrypt.hashSync(password, salt);
+
+    User.updateOne(
+      { _id: profileID },
+      {
+        $set: {
+          name, password: hashPass, address, city, cep, cpf
+        }
+      },
+    )
+      .then((profile) => {
+        res.status(200).json(profile);
+      })
+      .catch((error) => {
+        res.status(501).json(profile);
+      });
+  }
+});
+
 userRoutes.get('/profile/:userID', ensureAuthenticated, (req, res) => {
   const userId = req.params.userID;
   User.findById(userId).populate('product')
@@ -16,30 +59,6 @@ userRoutes.get('/profile/:userID', ensureAuthenticated, (req, res) => {
       res.status(200).json(profile);
     })
     .catch(err => console.log(err));
-});
-
-userRoutes.put('/profile/edit/:profileID', ensureAuthenticated, (req, res, next) => {
-  const { profileID } = req.params;
-  const {
-    password, name, address, city, cep,
-  } = req.body;
-  const salt = bcrypt.genSaltSync(10);
-  const hashPass = bcrypt.hashSync(password, salt);
-
-  User.updateOne(
-    { _id: profileID },
-    {
-      $set: {
-        name, password: hashPass, address, city, cep,
-      }
-    },
-  )
-    .then((profile) => {
-      res.status(200).json(profile);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
 });
 
 // route for the user start his sell
