@@ -262,9 +262,7 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
         .catch(err => res.status(500).json(err));
     })
     .catch(err => res.status(500).json(err));
-}
-});
-
+})
 
 // find user shoppingCart, will not display the purchased carts
 
