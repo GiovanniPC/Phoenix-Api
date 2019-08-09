@@ -367,7 +367,7 @@ authRoutes.get('/loggedin', (req, res, next) => {
 authRoutes.get('/confirm/:id', (req, res, next) => {
   User.findOneAndUpdate({ token: req.params.id }, { $set: { status: 'Active' } })
     .then((answer) => {
-      res.status(200).json(answer);
+      res.redirect('http://phixit.xyz')
     })
     .catch(() => res.status(500).json({ message: 'Confirmation failed.' }))
 })
