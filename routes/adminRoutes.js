@@ -35,7 +35,7 @@ adminRoutes.get('/companies/:id', ensureAuthenticated, isRole('Admin'), (req, re
 adminRoutes.get('/products/all', ensureAuthenticated, isRole('Admin'), (req, res, next) => {
   Product.find()
     .then((answer) => {
-      res.redirect('http://phixit.xyz')
+      res.status(200).json(answer)
     })
     .catch(err => res.status(500).json(err));
 });
