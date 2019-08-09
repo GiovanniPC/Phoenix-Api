@@ -243,6 +243,20 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
 
   const { status } = req.body;
 
+  ShoppingCart.findById(req.params.id)
+    .then((answer) => {
+      answer.products.forEach((item) => {
+        Product.findById(item)
+          .then((product) => {
+            if (product.status === 'Sold') {
+              res.status(200).json({ message: 'Im sorry dave, im afraid you cant do that' })
+            }
+          })
+          .catch()
+      })
+    })
+    .catch()
+
   ShoppingCart.update({ _id: req.params.id }, { $set: { status } })
     .then(() => {
       ShoppingCart
@@ -262,9 +276,7 @@ productRoutes.put('/cart-edit/:id', ensureAuthenticated, (req, res, next) => {
         .catch(err => res.status(500).json(err));
     })
     .catch(err => res.status(500).json(err));
-}
-});
-
+})
 
 // find user shoppingCart, will not display the purchased carts
 
